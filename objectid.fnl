@@ -7,17 +7,18 @@
 (fn byte-to-hex [byte]
   (..
     (if (<= byte 15) "0" "")
-    (string.format "%x" byte)
-    ))
+    (string.format "%x" byte)))
 
-(local intstep
-  (do
-    (var nextnum (math.floor (* (rand.rand) 0xFFFFFF)))
-    (fn []
-      (set nextnum (% (+ nextnum 1) 0xFFFFFF))
-      nextnum)))
+(fn stepper [n]
+  (var num n)
+  (fn []
+      (set num (% (+ num 1) 0xFFFFFF))
+      num))
 
-(fn to-hex-byte [n] (band n 0XFF))
+(local int-step (stepper (math.floor (* (rand.rand) 0xFFFFFF))))
+
+(fn to-byte [n] (band n 0XFF))
+
 (fn bytes-to-hex [bytes]
   (if (= (length bytes) 0)
     ""
@@ -26,29 +27,27 @@
       (bytes-to-hex (utils.cdr bytes)))))
 
 
-(fn objectid [machineID pid]
-  (let [t (% (os.time) 0xFFFFFFFF)]
-    (let [num (intstep)]
+(fn objectid [t machineID pid]
+    (let [num (int-step)]
       (bytes-to-hex
         [
-         (to-hex-byte (rshift t 24))
-         (to-hex-byte (rshift t 16))
-         (to-hex-byte (rshift t 8))
-         (to-hex-byte t)
-         (to-hex-byte (rshift machineID 16))
-         (to-hex-byte (rshift machineID 8))
-         (to-hex-byte machineID)
-         (to-hex-byte (rshift pid 16))
-         (to-hex-byte pid)
-         (to-hex-byte (rshift num 16))
-         (to-hex-byte (rshift num 8))
-         (to-hex-byte num)
-         ]))))
+         (to-byte (rshift t 24))
+         (to-byte (rshift t 16))
+         (to-byte (rshift t 8))
+         (to-byte t)
+         (to-byte (rshift machineID 16))
+         (to-byte (rshift machineID 8))
+         (to-byte machineID)
+         (to-byte (rshift pid 8))
+         (to-byte pid)
+         (to-byte (rshift num 16))
+         (to-byte (rshift num 8))
+         (to-byte num)
+         ])))
 
-
-(local generate (do
+(fn create-generator []
   (local machineID (math.floor (* (rand.rand) 0xFFFFFF)))
-  (local pid (math.floor (* (rand.rand) 0xFFFFFF)))
-  (fn [] (objectid machineID pid))))
+  (local pid (math.floor (* (rand.rand) 0xFFFF)))
+  (fn [] (objectid (% (os.time) 0xFFFFFFFF) machineID pid)))
 
-{:generate generate}
+{:generate (create-generator)}
