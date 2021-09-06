@@ -15,10 +15,7 @@ fennel main.fnl 10
 
 ## Compile to lua
 ```sh
-for i in *.fnl
-do
-	fennel --compile $i > "${i%.*}.lua"
-done
+fennel --compile --require-as-include main.fnl > main.lua
 ```
 
 ```sh
