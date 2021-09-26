@@ -1,5 +1,10 @@
 ;;;; objectid-redis lua script to generate mongodb objectid in redis
 
+(do
+  (local t (redis.call "time"))
+  (math.randomseed
+  (+ (* (tonumber (. t 1)) 1000000) (tonumber (. t 2)))))
+
 (fn car [tbl] (. tbl 1))
 (fn cdr [tbl]
   (let [out [(unpack tbl)]]
@@ -50,14 +55,13 @@
 (fn create-generator []
   (local machineID (math.floor (* (math.random) 0xFFFFFF)))
   (local pid (math.floor (* (math.random) 0xFFFF)))
+  (print machineID pid)
   #(let [t (redis.call "time")]
      (objectid
        (% (. t 1) 0xFFFFFFFF)
        machineID pid)))
-
 (let [objectid (create-generator)
-      output []
-      ]
-  (for [i 1 (tonumber (. KEYS 1))]
-    (table.insert output (objectid)))
-  output)
+      output []]
+    (for [i 1 (tonumber (. KEYS 1))]
+      (table.insert output (objectid)))
+    output)
