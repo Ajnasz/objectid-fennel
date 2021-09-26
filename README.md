@@ -26,3 +26,11 @@ To generate 10 objectids
 ```sh
 lua main.lua 10
 ```
+
+
+## ObjectID redis
+
+```sh
+$ fennel --compile objectid-redis.fnl > objectid-redis.lua
+$ redis-cli --eval objectid-redis.lua 100
+```
