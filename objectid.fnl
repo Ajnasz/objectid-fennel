@@ -2,7 +2,8 @@
 (local math (require :math))
 (local string (require :string))
 (local rand (require :rand))
-(local utils (require :utils))
+(local utils (require :tableutils))
+(local procutils (require :procutils))
 
 (fn byte-to-hex [byte]
   (..
@@ -47,7 +48,7 @@
 
 (fn create-generator []
   (local machineID (math.floor (* (rand.rand) 0xFFFFFF)))
-  (local pid (math.floor (* (rand.rand) 0xFFFF)))
+  (local pid (procutils.get-pid))
   (fn [] (objectid (% (os.time) 0xFFFFFFFF) machineID pid)))
 
 {:generate (create-generator)}
