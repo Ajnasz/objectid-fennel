@@ -48,7 +48,7 @@
 
 (fn create-generator []
   (local machineID (math.floor (* (rand.rand) 0xFFFFFF)))
-  (local pid (procutils.get-pid))
+  (local pid (% (procutils.get-pid) 0xFFFF))
   (fn [] (objectid (% (os.time) 0xFFFFFFFF) machineID pid)))
 
 {:generate (create-generator)}
