@@ -1,6 +1,5 @@
 (local math (require :math))
 (local objectid (require :objectid))
-(local rand (require :rand))
 (local lapp (require :pl.lapp))
 
 (local opts (lapp "
