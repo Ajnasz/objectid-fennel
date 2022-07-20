@@ -28,27 +28,29 @@
       (bytes-to-hex (utils.cdr bytes)))))
 
 
-(fn objectid [t machineID pid]
-    (let [num (int-step)]
-      (bytes-to-hex
-        [
-         (to-byte (rshift t 24))
-         (to-byte (rshift t 16))
-         (to-byte (rshift t 8))
-         (to-byte t)
-         (to-byte (rshift machineID 16))
-         (to-byte (rshift machineID 8))
-         (to-byte machineID)
-         (to-byte (rshift pid 8))
-         (to-byte pid)
-         (to-byte (rshift num 16))
-         (to-byte (rshift num 8))
-         (to-byte num)
-         ])))
+(fn objectid-bytes [t machineID pid]
+  (let [num (int-step)]
+    [
+     (to-byte (rshift t 24))
+     (to-byte (rshift t 16))
+     (to-byte (rshift t 8))
+     (to-byte t)
+     (to-byte (rshift machineID 16))
+     (to-byte (rshift machineID 8))
+     (to-byte machineID)
+     (to-byte (rshift pid 8))
+     (to-byte pid)
+     (to-byte (rshift num 16))
+     (to-byte (rshift num 8))
+     (to-byte num)
+     ]))
 
-(fn create-generator []
+(fn objectid [t machineID pid]
+  (bytes-to-hex (objectid-bytes t machineID pid)))
+
+(fn create-generator [gen]
   (local machineID (math.floor (* (rand.rand) 0xFFFFFF)))
   (local pid (% (procutils.get-pid) 0xFFFF))
-  (fn [] (objectid (% (os.time) 0xFFFFFFFF) machineID pid)))
+  (fn [] (gen (% (os.time) 0xFFFFFFFF) machineID pid)))
 
-{:generate (create-generator)}
+{:generate (create-generator objectid) :bytes (create-generator objectid-bytes)}
